@@ -1,0 +1,34 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#main {
+  display: grid;
+  width: fit-content;
+  row-gap: 2px;
+  column-gap: 2px;
+}
+
+#controls {
+  margin-bottom: 10px;
+}
+
+.block {
+  background-color: cyan;
+  height: 15px;
+  width: 15px;
+}
+
+.block.block-player {
+  background-color: yellow;
+}
+
+.block.block-obstacle {
+  background-color: red;
+}
+
+.block.block-target {
+  background-color: green;
+}
