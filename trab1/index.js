@@ -2,7 +2,7 @@
 // 1 é o jogador
 // 2 é o obstaculo
 // 3 é a meta
-const size = 10;
+const tamanho = 10;
 
 const blockStatus = [];
 const divs = [];
@@ -10,16 +10,33 @@ const divs = [];
 const xJogador = 0;
 const yJogador = 0;
 
-const xMeta = size - 1;
-const yMeta = size - 1;
+const xMeta = tamanho - 1;
+const yMeta = tamanho - 1;
 
-//
+let timer;
+
+function começar() {
+  if(!timer) {
+    timer = setInterval(loop, 1000)
+  }
+}
+
+function parar() {
+  if(timer) {
+    clearInterval(timer)
+  }
+}
+
+function loop() {
+  console.log('a')
+}
+
 function configurarJogo() {
   blockStatus[0][0] = 1
   divs[0][0].classList.add('block-player')
 
-  for (let i = 0; i < size; i++) {
-    for (let j = 0; j < size; j++) {
+  for (let i = 0; i < tamanho; i++) {
+    for (let j = 0; j < tamanho; j++) {
       if(i === xJogador && j === yJogador) continue;
       if(i === xMeta && j === yMeta) continue;
 
@@ -40,14 +57,14 @@ function main() {
   const container = document.querySelector('#main');
 
   // configura o estilo da grid
-  container.style.gridTemplateColumns = `repeat(${size}, 1fr)` 
-  container.style.gridTemplateRows = `repeat(${size}, 1fr)` 
+  container.style.gridTemplateColumns = `repeat(${tamanho}, 1fr)` 
+  container.style.gridTemplateRows = `repeat(${tamanho}, 1fr)` 
 
   // cria a grid e salva os status nos arrays blockStatus e divs
-  for (let i = 0; i < size; i++) {
+  for (let i = 0; i < tamanho; i++) {
     const rowStatus = []
     const rowDivs = []
-    for (let j = 0; j < size; j++) {
+    for (let j = 0; j < tamanho; j++) {
       rowStatus.push(0);
       const block = document.createElement('div');
 
