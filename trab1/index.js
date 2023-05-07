@@ -5,6 +5,8 @@
 const blocoEstado = [];
 const divs = [];
 
+const delayMovimento = 1000; // 1 segundo
+
 const tamanhoGrid = 10;
 
 let xRobo = 0;
@@ -30,10 +32,9 @@ let custoAtual = 0;
 
 let timer;
 
-
 function começar() {
   if(!timer) {
-    timer = setInterval(loop, 1000)
+    timer = setInterval(loop, delayMovimento)
   }
 }
 
@@ -44,7 +45,48 @@ function parar() {
 }
 
 function loop() {
-  console.log('a')
+  if(checaMeta(xRobo, yRobo)) alert('acabou')
+}
+
+// 1 => direita
+// -1 => esquerda
+function girarRobo(movimento) {
+  const novaDirecao = direcaoAtual + movimento;
+
+  if(novaDirecao < 0) direcaoAtual = 3;
+  else if(novaDirecao > 3) direcaoAtual = 0;
+  else direcaoAtual = novaDirecao
+}
+
+function checaObstaculo(x, y) {
+  // se não existir bloco ali ou se for um do tipo 2 (obstaculo)
+  return blocoEstado[x] === undefined 
+    || blocoEstado[x][y] === undefined 
+    || blocoEstado[x][y] === 2
+}
+
+function checaMeta(x, y) {
+  return blocoEstado[x][y] === 3
+}
+
+// x + 1 = para cima
+// x - 1 = para esquerda
+// y + 1 = para direita
+// y - 1 = para esquerda
+function moverRobo(x, y) {
+  const novoX = xRobo + x;
+  const novoY = yRobo + y;
+  
+  if(checaObstaculo(novoX, novoY)) return;
+
+
+  blocoEstado[xRobo][yRobo] = 0;
+  divs[xRobo][yRobo].className = 'bloco';
+
+  xRobo = novoX;
+  yRobo = novoY;
+
+  divs[xRobo][yRobo].classList.add('bloco-robo');
 }
 
 function configurarJogo() {
@@ -99,6 +141,21 @@ function main() {
   }
 }
 
+
 document.addEventListener('DOMContentLoaded', function() {
   main()
 })
+
+document.addEventListener('keydown', function(event) {
+  if (event.code === 'KeyW') moverRobo(-1, 0)
+
+  if (event.code === 'KeyS') moverRobo(1, 0)
+
+  if (event.code === 'KeyA') moverRobo(0, -1)
+
+  if (event.code === 'KeyD') moverRobo(0, 1)
+
+  if (event.code === 'KeyQ') girarRobo(1)
+  
+  if (event.code === 'KeyE') girarRobo(-1) 
+});
