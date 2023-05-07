@@ -1,19 +1,35 @@
 // 0 é vazio 
-// 1 é o jogador
+// 1 é o robo
 // 2 é o obstaculo
 // 3 é a meta
-const tamanho = 10;
-
-const blockStatus = [];
+const blocoEstado = [];
 const divs = [];
 
-const xJogador = 0;
-const yJogador = 0;
+const tamanhoGrid = 10;
 
-const xMeta = tamanho - 1;
-const yMeta = tamanho - 1;
+let xRobo = 0;
+let yRobo = 0;
+
+//0 = norte
+//1 = leste
+//2 = sul
+//3 = oeste
+let direcaoAtual = 0
+
+const xMeta = tamanhoGrid - 1;
+const yMeta = tamanhoGrid - 1;
+
+const custos = {
+  parado: 1000,
+  bater: 1000,
+  girar: 1,
+  andar: 0,
+};
+
+let custoAtual = 0;
 
 let timer;
+
 
 function começar() {
   if(!timer) {
@@ -32,49 +48,54 @@ function loop() {
 }
 
 function configurarJogo() {
-  blockStatus[0][0] = 1
-  divs[0][0].classList.add('block-player')
+  blocoEstado[0][0] = 1
+  divs[0][0].className = 'bloco'
+  divs[0][0].classList.add('bloco-robo')
+  custoAtual = 0;
+  xRobo = 0
+  yRobo = 0
 
-  for (let i = 0; i < tamanho; i++) {
-    for (let j = 0; j < tamanho; j++) {
-      if(i === xJogador && j === yJogador) continue;
+  for (let i = 0; i < tamanhoGrid; i++) {
+    for (let j = 0; j < tamanhoGrid; j++) {
+      if(i === xRobo && j === yRobo) continue;
       if(i === xMeta && j === yMeta) continue;
 
-      divs[i][j].className = 'block'
+      blocoEstado[i][j] = 0
+      divs[i][j].className = 'bloco'
 
       if (Math.random() < 0.2 ) {
-        blockStatus[i][j] = 2;
-        divs[i][j].classList.add('block-obstacle');
+        blocoEstado[i][j] = 2;
+        divs[i][j].classList.add('bloco-obstaculo');
       }
     }
   }
 
-  blockStatus[xMeta][yMeta] = 3;
-  divs[xMeta][yMeta].classList.add('block-target')
+  blocoEstado[xMeta][yMeta] = 3;
+  divs[xMeta][yMeta].classList.add('bloco-meta')
 }
 
 function main() {
-  const container = document.querySelector('#main');
+  const mainDiv = document.querySelector('#main');
 
   // configura o estilo da grid
-  container.style.gridTemplateColumns = `repeat(${tamanho}, 1fr)` 
-  container.style.gridTemplateRows = `repeat(${tamanho}, 1fr)` 
+  mainDiv.style.gridTemplateColumns = `repeat(${tamanhoGrid}, 1fr)` 
+  mainDiv.style.gridTemplateRows = `repeat(${tamanhoGrid}, 1fr)` 
 
-  // cria a grid e salva os status nos arrays blockStatus e divs
-  for (let i = 0; i < tamanho; i++) {
-    const rowStatus = []
-    const rowDivs = []
-    for (let j = 0; j < tamanho; j++) {
-      rowStatus.push(0);
-      const block = document.createElement('div');
+  // cria a grid e salva os status nos arrays blocoStatus e divs
+  for (let i = 0; i < tamanhoGrid; i++) {
+    const linhaEstado = []
+    const linhaDivs = []
+    for (let j = 0; j < tamanhoGrid; j++) {
+      linhaEstado.push(0);
+      const bloco = document.createElement('div');
 
-      block.classList.add('block');
+      bloco.classList.add('bloco');
 
-      container.appendChild(block);
-      rowDivs.push(block)
+      mainDiv.appendChild(bloco);
+      linhaDivs.push(bloco)
     }
-    blockStatus.push(rowStatus)
-    divs.push(rowDivs)
+    blocoEstado.push(linhaEstado)
+    divs.push(linhaDivs)
   }
 }
 

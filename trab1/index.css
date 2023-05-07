@@ -15,20 +15,20 @@ body {
   margin-bottom: 10px;
 }
 
-.block {
+.bloco {
   background-color: cyan;
   height: 15px;
   width: 15px;
 }
 
-.block.block-player {
+.bloco.bloco-robo {
   background-color: yellow;
 }
 
-.block.block-obstacle {
+.bloco.bloco-obstaculo {
   background-color: red;
 }
 
-.block.block-target {
+.bloco.bloco-meta {
   background-color: green;
 }
