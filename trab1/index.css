@@ -24,12 +24,16 @@ body {
 
 .bloco.bloco-robo {
   background: transparent;
+}
+
+.robo {
   background-image: url('assets/robo.png');
   background-size: 50px;
   border-radius: 24px;
   background-repeat: no-repeat;
-  transform-origin: center;
-  
+  transform-origin: center; 
+  height: 100%;
+  width: 100%;
 }
 
 .bloco.bloco-obstaculo {

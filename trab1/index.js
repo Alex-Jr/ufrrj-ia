@@ -1,27 +1,44 @@
+// -1 é que ja passou, mas quanto menor é a quantidade de vezes que ja passou lá
 // 0 é vazio 
 // 1 é o robo
 // 2 é o obstaculo
 // 3 é a meta
-const blocoEstado = [];
-const divs = [];
+let blocoEstado = [];
+let divs = [];
 
-const delayMovimento = 1000; // 1 segundo
+const delayMovimento = 50; // 1 segundo
 
 const tamanhoGrid = 10;
 
 let xRobo = 0;
 let yRobo = 0;
 
-//0 = norte
-//1 = nordeste
-//2 = leste
-//3 = sudeste
-//4 = sul
-//5 = sudoeste
-//6 = oeste
-//7 = noroeste
+const NORTE = 0;
+const NORDESTE = 1;
+const LESTE = 2;
+const SUDESTE = 3;
+const SUL = 4;
+const SUDOESTE = 5;
+const OESTE = 6;
+const NOROESTE = 7
 
-let direcaoAtual = 0
+const DIRECOES = [0, 1, 2, 3, 4, 5, 6 ,7]
+const DIRECOESTXT = [
+  "NORTE",
+  "NORDESTE",
+  "LESTE",
+  "SUDESTE",
+  "SUL",
+  "SUDOESTE",
+  "OESTE",
+  "NOROESTE"
+];
+
+
+const DIREITA = 1;
+const ESQUERDA = -1;
+
+let direcaoAtual = NORTE;
 
 const xMeta = tamanhoGrid - 1;
 const yMeta = tamanhoGrid - 1;
@@ -34,6 +51,8 @@ const custos = {
 };
 
 let custoAtual = 0;
+let qntGiro = 0;
+let qntMovimento = 0;
 
 let timer;
 
@@ -49,25 +68,6 @@ function parar() {
   }
 }
 
-function loop() {
-  if(checaMeta(xRobo, yRobo)) alert('acabou')
-}
-
-// 1 => direita
-// -1 => esquerda
-function girarRobo(movimento) {
-  const novaDirecao = direcaoAtual + movimento;
-
-  if(novaDirecao < 0) direcaoAtual = 7;
-  else if(novaDirecao > 7) direcaoAtual = 0;
-  else direcaoAtual = novaDirecao
-
-  const roboElement = document.querySelector(".bloco-robo");
-  roboElement.style.transform = `rotate(${[(direcaoAtual + 1) * 45]}deg)`;
-
-  
-}
-
 function checaObstaculo(x, y) {
   // se não existir bloco ali ou se for um do tipo 2 (obstaculo)
   return blocoEstado[x] === undefined 
@@ -79,35 +79,204 @@ function checaMeta(x, y) {
   return blocoEstado[x][y] === 3
 }
 
-// x + 1 = para cima
-// x - 1 = para esquerda
-// y + 1 = para direita
-// y - 1 = para esquerda
-function moverRobo(x, y) {
-  const novoX = xRobo + x;
-  const novoY = yRobo + y;
+function calculaMovimento(direcao) {
+  let yNovo = 0;
+  let xNovo = 0;
+
+  switch (direcao) {
+    case NORTE:
+      xNovo = xRobo;
+      yNovo = yRobo - 1;
+      break;
+    case NORDESTE:
+      xNovo = xRobo + 1;
+      yNovo = yRobo - 1;
+      break;
+    case LESTE:
+      xNovo = xRobo + 1;
+      yNovo = yRobo;
+      break;
+    case SUDESTE:
+      xNovo = xRobo + 1;
+      yNovo = yRobo + 1;
+      break;
+    case SUL:
+      xNovo = xRobo;
+      yNovo = yRobo + 1;
+      break;
+    case SUDOESTE:
+      xNovo = xRobo - 1;
+      yNovo = yRobo + 1;
+      break;
+    case OESTE:
+      xNovo = xRobo - 1;
+      yNovo = yRobo;
+      break;
+    case NOROESTE:
+      xNovo = xRobo - 1;
+      yNovo = yRobo - 1;
+      break;
+  }
   
-  if(checaObstaculo(novoX, novoY)) return;
+  return {
+    xNovo, yNovo,
+  }
+}
+
+function calcularMenorNumeroGiros(direcaoNova) {
+  const totalRotacoes = 8; // Total de possibilidades de rotação
+  const distanciaAngular = (direcaoNova - direcaoAtual + totalRotacoes) % totalRotacoes;
+  const menorNumeroGiros = Math.min(distanciaAngular, totalRotacoes - distanciaAngular);
+
+  let direcaoGiro;
+  if (distanciaAngular <= totalRotacoes / 2) {
+    direcaoGiro = DIREITA;
+  } else {
+    direcaoGiro = ESQUERDA;
+  }
+
+  return { menorNumeroGiros, direcaoGiro }
+}
+
+function imprimeCusto(cust) {
+  console.table(DIRECOESTXT.map((d, index) => ({ direcao: d, custo: cust[index]})))
+}
+
+// se tiver um positivo, retorne o menor
+// se só tiver negavito, retorne o maior
+function encontrarNumero(array) {
+  var menorPositivo = Infinity;
+  var maiorNegativo = -Infinity;
+
+  for (var i = 0; i < array.length; i++) {
+    var numero = array[i];
+
+    if (numero > 0 && numero < menorPositivo) {
+      menorPositivo = numero;
+    } else if (numero < 0 && numero > maiorNegativo) {
+      maiorNegativo = numero;
+    }
+  }
+
+  if (menorPositivo !== Infinity) {
+    return menorPositivo;
+  } else {
+    return maiorNegativo;
+  }
+}
+
+function buscaProfundidade(manual = false) {
+  const cust = [];
+  const mov = []
+
+  for(const direcao of DIRECOES) {
+    const { xNovo, yNovo } = calculaMovimento(direcao)
+    if(checaObstaculo(xNovo, yNovo)) {
+      cust.push(1000);
+      mov.push({direcaoGiro: undefined, qntGiro: undefined})
+      continue
+    }
+
+    const { direcaoGiro, menorNumeroGiros } = calcularMenorNumeroGiros(direcao);
+
+    const custoBloco = blocoEstado[xNovo][yNovo] > 0 ? 0 : -blocoEstado[xNovo][yNovo];
+    cust.push(menorNumeroGiros + 1 + custoBloco);
+    mov.push({ direcaoGiro, qntGiro: menorNumeroGiros } )
+  }
+
+  if(manual) {
+    imprimeCusto(cust);
+  }
+  
+  const index = cust.indexOf(encontrarNumero(cust));
+  const giro = mov[index];
+
+  if(manual) {
+    console.log(index);
+    console.log(giro);
+  }
 
 
-  blocoEstado[xRobo][yRobo] = 0;
+
+  for(let i = 0; i < giro.qntGiro; i++) {
+    girarRobo(giro.direcaoGiro);
+  }
+  moverRobo();
+}
+
+function loop() {
+  buscaProfundidade();
+
+  if(checaMeta(xRobo, yRobo)) {
+    parar()
+    alert('acabou')
+  }
+}
+
+// 1 => direita
+// -1 => esquerda
+function girarRobo(movimento) {
+  qntGiro += 1;
+
+  switch (movimento) {
+    case DIREITA: 
+      direcaoAtual = (direcaoAtual + 1) % 8;
+      break;
+    case ESQUERDA:
+      direcaoAtual = (direcaoAtual + 7) % 8;
+      break;
+  }
+
+  const roboElement = document.querySelector(".robo");
+  roboElement.style.transform = `rotate(${[(direcaoAtual) * 45]}deg)`;
+}
+
+let oldState = 0;
+// robo se move somente para frente
+function moverRobo() { 
+  const { xNovo, yNovo } = calculaMovimento(direcaoAtual)
+
+  if(checaObstaculo(xNovo, yNovo)) return;
+
+  qntMovimento += 1;
+    
+  // salva a div do robo
+  const robo = divs[xRobo][yRobo].childNodes[0];
+
+  // vai adicionando custo no bloco que ele ja estava
+  blocoEstado[xRobo][yRobo] = oldState - 1;
   divs[xRobo][yRobo].className = 'bloco';
+  divs[xRobo][yRobo].removeChild(robo)
 
-  xRobo = novoX;
-  yRobo = novoY;
+  // move o robo
+  xRobo = xNovo;
+  yRobo = yNovo;
 
+  // atualiza a div onde o robo está
+  oldState = blocoEstado[xRobo][yRobo];
+
+  blocoEstado[xRobo][yRobo] = 1;
   divs[xRobo][yRobo].classList.add('bloco-robo');
-
+  divs[xRobo][yRobo].appendChild(robo)
 }
 
 function configurarJogo() {
-  blocoEstado[0][0] = 1
-  divs[0][0].className = 'bloco'
-  divs[0][0].classList.add('bloco-robo')
+  main();
+
   custoAtual = 0;
   xRobo = 0
   yRobo = 0
 
+
+  // configura o robo inciial
+  blocoEstado[xRobo][yRobo] = 1
+  divs[xRobo][yRobo].className = 'bloco'
+  divs[xRobo][yRobo].classList.add('bloco-robo')
+  const robo = document.createElement('div');
+  robo.classList.add('robo');
+  divs[xRobo][yRobo].appendChild(robo);
+
+  
   for (let i = 0; i < tamanhoGrid; i++) {
     for (let j = 0; j < tamanhoGrid; j++) {
       if(i === xRobo && j === yRobo) continue;
@@ -129,10 +298,16 @@ function configurarJogo() {
 
 function main() {
   const mainDiv = document.querySelector('#main');
+  // deixa em branco a main div
+  mainDiv.innerHTML = ''
 
   // configura o estilo da grid
   mainDiv.style.gridTemplateColumns = `repeat(${tamanhoGrid}, 1fr)` 
   mainDiv.style.gridTemplateRows = `repeat(${tamanhoGrid}, 1fr)` 
+
+  // apaga antigo jogo
+  blocoEstado = [];
+  divs = [];
 
   // cria a grid e salva os status nos arrays blocoStatus e divs
   for (let i = 0; i < tamanhoGrid; i++) {
@@ -150,6 +325,26 @@ function main() {
     blocoEstado.push(linhaEstado)
     divs.push(linhaDivs)
   }
+
+  blocoEstado = inverterColunasPorLinhas(blocoEstado)
+  divs = inverterColunasPorLinhas(divs)
+}
+
+// Criar uma nova matriz com as colunas invertidas
+function inverterColunasPorLinhas(matriz) {
+  const linhas = matriz.length;
+  const colunas = matriz[0].length;
+
+  const novaMatriz = [];
+  for (let coluna = 0; coluna < colunas; coluna++) {
+    const novaColuna = [];
+    for (let linha = 0; linha < linhas; linha++) {
+      novaColuna.push(matriz[linha][coluna]);
+    }
+    novaMatriz.push(novaColuna);
+  }
+
+  return novaMatriz;
 }
 
 
@@ -158,15 +353,11 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 
 document.addEventListener('keydown', function(event) {
-  if (event.code === 'KeyW') moverRobo(-1, 0)
+  if (event.code === 'KeyW') moverRobo()
 
-  if (event.code === 'KeyS') moverRobo(1, 0)
-
-  if (event.code === 'KeyA') moverRobo(0, -1)
-
-  if (event.code === 'KeyD') moverRobo(0, 1)
-
-  if (event.code === 'KeyQ') girarRobo(1)
+  if (event.code === 'KeyQ') girarRobo(ESQUERDA)
   
-  if (event.code === 'KeyE') girarRobo(-1) 
+  if (event.code === 'KeyE') girarRobo(DIREITA) 
+
+  if (event.code === 'KeyP') buscaProfundidade(true);
 });
