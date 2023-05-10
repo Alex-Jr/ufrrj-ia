@@ -3,8 +3,8 @@
 // 1 é o robo
 // 2 é o obstaculo
 // 3 é a meta
-let blocoEstado = [];
-let divs = [];
+let matrixBlocos = [];
+let matrixDivs = [];
 
 const delayMovimento = 50; // 1 segundo
 
@@ -70,13 +70,13 @@ function parar() {
 
 function checaObstaculo(x, y) {
   // se não existir bloco ali ou se for um do tipo 2 (obstaculo)
-  return blocoEstado[x] === undefined 
-    || blocoEstado[x][y] === undefined 
-    || blocoEstado[x][y] === 2
+  return matrixBlocos[x] === undefined 
+    || matrixBlocos[x][y] === undefined 
+    || matrixBlocos[x][y] === 2
 }
 
 function checaMeta(x, y) {
-  return blocoEstado[x][y] === 3
+  return matrixBlocos[x][y] === 3
 }
 
 function calculaMovimento(direcao) {
@@ -179,7 +179,7 @@ function buscaProfundidade(manual = false) {
 
     const { direcaoGiro, menorNumeroGiros } = calcularMenorNumeroGiros(direcao);
 
-    const custoBloco = blocoEstado[xNovo][yNovo] > 0 ? 0 : -blocoEstado[xNovo][yNovo];
+    const custoBloco = matrixBlocos[xNovo][yNovo] > 0 ? 0 : -matrixBlocos[xNovo][yNovo];
     cust.push(menorNumeroGiros + 1 + custoBloco);
     mov.push({ direcaoGiro, qntGiro: menorNumeroGiros } )
   }
@@ -241,23 +241,23 @@ function moverRobo() {
   qntMovimento += 1;
     
   // salva a div do robo
-  const robo = divs[xRobo][yRobo].childNodes[0];
+  const robo = matrixDivs[xRobo][yRobo].childNodes[0];
 
   // vai adicionando custo no bloco que ele ja estava
-  blocoEstado[xRobo][yRobo] = oldState - 1;
-  divs[xRobo][yRobo].className = 'bloco';
-  divs[xRobo][yRobo].removeChild(robo)
+  matrixBlocos[xRobo][yRobo] = oldState - 1;
+  matrixDivs[xRobo][yRobo].className = 'bloco';
+  matrixDivs[xRobo][yRobo].removeChild(robo)
 
   // move o robo
   xRobo = xNovo;
   yRobo = yNovo;
 
   // atualiza a div onde o robo está
-  oldState = blocoEstado[xRobo][yRobo];
+  oldState = matrixBlocos[xRobo][yRobo];
 
-  blocoEstado[xRobo][yRobo] = 1;
-  divs[xRobo][yRobo].classList.add('bloco-robo');
-  divs[xRobo][yRobo].appendChild(robo)
+  matrixBlocos[xRobo][yRobo] = 1;
+  matrixDivs[xRobo][yRobo].classList.add('bloco-robo');
+  matrixDivs[xRobo][yRobo].appendChild(robo)
 }
 
 function configurarJogo() {
@@ -269,12 +269,12 @@ function configurarJogo() {
 
 
   // configura o robo inciial
-  blocoEstado[xRobo][yRobo] = 1
-  divs[xRobo][yRobo].className = 'bloco'
-  divs[xRobo][yRobo].classList.add('bloco-robo')
+  matrixBlocos[xRobo][yRobo] = 1
+  matrixDivs[xRobo][yRobo].className = 'bloco'
+  matrixDivs[xRobo][yRobo].classList.add('bloco-robo')
   const robo = document.createElement('div');
   robo.classList.add('robo');
-  divs[xRobo][yRobo].appendChild(robo);
+  matrixDivs[xRobo][yRobo].appendChild(robo);
 
   
   for (let i = 0; i < tamanhoGrid; i++) {
@@ -282,18 +282,18 @@ function configurarJogo() {
       if(i === xRobo && j === yRobo) continue;
       if(i === xMeta && j === yMeta) continue;
 
-      blocoEstado[i][j] = 0
-      divs[i][j].className = 'bloco'
+      matrixBlocos[i][j] = 0
+      matrixDivs[i][j].className = 'bloco'
 
       if (Math.random() < 0.2 ) {
-        blocoEstado[i][j] = 2;
-        divs[i][j].classList.add('bloco-obstaculo');
+        matrixBlocos[i][j] = 2;
+        matrixDivs[i][j].classList.add('bloco-obstaculo');
       }
     }
   }
 
-  blocoEstado[xMeta][yMeta] = 3;
-  divs[xMeta][yMeta].classList.add('bloco-meta')
+  matrixBlocos[xMeta][yMeta] = 3;
+  matrixDivs[xMeta][yMeta].classList.add('bloco-meta')
 }
 
 function main() {
@@ -306,47 +306,25 @@ function main() {
   mainDiv.style.gridTemplateRows = `repeat(${tamanhoGrid}, 1fr)` 
 
   // apaga antigo jogo
-  blocoEstado = [];
-  divs = [];
+  matrixBlocos = [];
+  matrixDivs = [];
 
   // cria a grid e salva os status nos arrays blocoStatus e divs
   for (let i = 0; i < tamanhoGrid; i++) {
-    const linhaEstado = []
-    const linhaDivs = []
+    matrixBlocos[i] = [];
+    matrixDivs[i] = []
     for (let j = 0; j < tamanhoGrid; j++) {
-      linhaEstado.push(0);
       const bloco = document.createElement('div');
 
       bloco.classList.add('bloco');
 
       mainDiv.appendChild(bloco);
-      linhaDivs.push(bloco)
+
+      matrixBlocos[i][j] = 0;
+      matrixDivs[i][j] = bloco;
     }
-    blocoEstado.push(linhaEstado)
-    divs.push(linhaDivs)
   }
-
-  blocoEstado = inverterColunasPorLinhas(blocoEstado)
-  divs = inverterColunasPorLinhas(divs)
 }
-
-// Criar uma nova matriz com as colunas invertidas
-function inverterColunasPorLinhas(matriz) {
-  const linhas = matriz.length;
-  const colunas = matriz[0].length;
-
-  const novaMatriz = [];
-  for (let coluna = 0; coluna < colunas; coluna++) {
-    const novaColuna = [];
-    for (let linha = 0; linha < linhas; linha++) {
-      novaColuna.push(matriz[linha][coluna]);
-    }
-    novaMatriz.push(novaColuna);
-  }
-
-  return novaMatriz;
-}
-
 
 document.addEventListener('DOMContentLoaded', function() {
   main()
