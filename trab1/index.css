@@ -16,13 +16,20 @@ body {
 }
 
 .bloco {
-  background-color: cyan;
-  height: 15px;
-  width: 15px;
+  background-color: rgb(236, 235, 126);
+  height: 50px;
+  width: 50px;
+  border-radius: 24px;
 }
 
 .bloco.bloco-robo {
-  background-color: yellow;
+  background: transparent;
+  background-image: url('assets/robo.png');
+  background-size: 50px;
+  border-radius: 24px;
+  background-repeat: no-repeat;
+  transform-origin: center;
+  
 }
 
 .bloco.bloco-obstaculo {

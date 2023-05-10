@@ -13,9 +13,14 @@ let xRobo = 0;
 let yRobo = 0;
 
 //0 = norte
-//1 = leste
-//2 = sul
-//3 = oeste
+//1 = nordeste
+//2 = leste
+//3 = sudeste
+//4 = sul
+//5 = sudoeste
+//6 = oeste
+//7 = noroeste
+
 let direcaoAtual = 0
 
 const xMeta = tamanhoGrid - 1;
@@ -53,9 +58,14 @@ function loop() {
 function girarRobo(movimento) {
   const novaDirecao = direcaoAtual + movimento;
 
-  if(novaDirecao < 0) direcaoAtual = 3;
-  else if(novaDirecao > 3) direcaoAtual = 0;
+  if(novaDirecao < 0) direcaoAtual = 7;
+  else if(novaDirecao > 7) direcaoAtual = 0;
   else direcaoAtual = novaDirecao
+
+  const roboElement = document.querySelector(".bloco-robo");
+  roboElement.style.transform = `rotate(${[(direcaoAtual + 1) * 45]}deg)`;
+
+  
 }
 
 function checaObstaculo(x, y) {
@@ -87,6 +97,7 @@ function moverRobo(x, y) {
   yRobo = novoY;
 
   divs[xRobo][yRobo].classList.add('bloco-robo');
+
 }
 
 function configurarJogo() {
