@@ -55,6 +55,21 @@ let qntMovimento = 0;
 
 let timer;
 
+
+function atualizarModo(novoModo) {
+  switch(novoModo) {
+    case 'buscaEstrela':
+      modo = buscaEstrela
+      break;
+    case 'buscaProfundidade':
+      modo = buscaProfundidade
+      break;
+    case 'buscaAleatoria':
+      modo = buscaAleatoria
+      break;
+  }
+}
+
 function começar() {
   if(!timer) {
     timer = setInterval(loop, delayMovimento)
@@ -178,6 +193,66 @@ function encontrarNumero(array) {
     return maiorNegativo;
   }
 }
+
+function buscaAleatoria(manual = false) {
+  const cust = [];
+  const mov = []
+
+  // calcula o custo de cada movimento
+  for(const direcao of DIRECOES) {
+    // verifica como chegamos lá
+    const { xNovo, yNovo } = calculaMovimento(direcao)
+
+    // verifica se tem um obstaculo, ou seja não podemos ir para lá
+    if(checaObstaculo(xNovo, yNovo)) {
+      cust.push(1000);
+      mov.push({direcaoGiro: undefined, qntGiro: undefined})
+      continue
+    }
+
+    // acha a melhor maneira de girar para essa direção específica
+    const { direcaoGiro, menorNumeroGiros } = calcularMenorNumeroGiros(direcao);
+
+    // adiciona o custo do bloco atual
+    // quando é menor que 0 quer dizer que ja estivemos nesse bloco
+    // cada vez que passamos lá denovo adiciona mais um de custo
+    const custoBloco = matrixBlocos[xNovo][yNovo] > 0 ? 0 : -matrixBlocos[xNovo][yNovo];
+
+    // custo de girar + custo de andar + penalidade de ja ter passado lá
+    cust.push(0 + custoBloco + direcaoGiro);
+
+    // salva a maneira para girar, pois aidna não decidimos como vamos se movimentar
+    mov.push({ direcaoGiro, qntGiro: menorNumeroGiros } )
+  }
+
+  if(manual) {
+    imprimeCusto(cust);
+  }
+  
+  let valor = 100;
+  // pega um aleatório q n seja obstaculo
+  do {
+    valor = cust[Math.floor(Math.random() * cust.length)]
+  } while(valor >= 1000);
+
+  const index = cust.indexOf(valor);
+  // acha como temos que girar
+  const giro = mov[index];
+
+  if(manual) {
+    console.log(index);
+    console.log(giro);
+  }
+
+  // gira o necessário
+  for(let i = 0; i < giro.qntGiro; i++) {
+    girarRobo(giro.direcaoGiro);
+  }
+
+  // se move para frente
+  moverRobo();
+}
+
 function buscaEstrela(manual = false) {
   const cust = [];
   const mov = []
@@ -291,9 +366,10 @@ function buscaProfundidade(manual = false) {
   moverRobo();
 }
 
+let modo = buscaEstrela;
 // isso irá rodar a cada execução
 function loop(manual = false) {
-  buscaEstrela(manual);
+  modo(manual);
 
   if(checaMeta(xRobo, yRobo)) {
     parar()

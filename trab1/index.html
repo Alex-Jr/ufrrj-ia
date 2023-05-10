@@ -11,6 +11,11 @@
       <button onclick="configurar()">Gerar</button>
       <button onclick="começar()">Começar</button>
       <button onclick="parar()">Pausar</button>
+      <select id="modo" onchange="atualizarModo(this.value)">
+        <option value="buscaEstrela">Busca Estrela</option>
+        <option value="buscaProfundidade">Busca Profundidade</option>
+        <option value="buscaAleatoria">Busca Aleatória</option>
+      </select>
     </div>
     <div id="main"></div>
   </body>
