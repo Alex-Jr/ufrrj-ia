@@ -76,7 +76,7 @@ function começar() {
   }
 }
 
-function parar() {
+function parar(isAlert = true) {
   if(timer) {
     clearInterval(timer)
     timer = undefined;
@@ -84,7 +84,7 @@ function parar() {
 
   if(checaMeta(xRobo, yRobo)){
     alert(`Cheguei ao final!\n o custo foi: ${custoAtual}\n girei: ${qntGiro}\n andei: ${qntMovimento} `)
-  } else if(xRobo !== 0 && yRobo !== 0) {
+  } else if(xRobo !== 0 && yRobo !== 0 && isAlert) {
     alert(`Não consegui chegar ao final\n o custo atual: ${custoAtual}\n girei: ${qntGiro}\n andei: ${qntMovimento} `)
   }
 }
@@ -449,7 +449,7 @@ function moverRobo(manual = false) {
 
 function configurar() {
   const tamanho = tamanhoGrid;
-  parar()
+  parar(false)
 
   // GRID 
   const mainDiv = document.querySelector('#main');
@@ -480,6 +480,8 @@ function configurar() {
 
   // ROBO, METAS E OBSTACULOS
   custoAtual = 0;
+  qntGiro = 0;
+  qntMovimento = 0;
   xRobo = 0
   yRobo = 0
 
