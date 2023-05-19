@@ -82,7 +82,7 @@ function parar(isAlert = true) {
     timer = undefined;
   }
 
-  if(checaMeta(xRobo, yRobo)){
+  if(checaMeta(xRobo, yRobo) && isAlert){
     alert(`Cheguei ao final!\n o custo foi: ${custoAtual}\n girei: ${qntGiro}\n andei: ${qntMovimento} `)
   } else if(isAlert) {
     alert(`Não consegui chegar ao final\n o custo atual: ${custoAtual}\n girei: ${qntGiro}\n andei: ${qntMovimento} `)
