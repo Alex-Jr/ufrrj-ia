@@ -81,6 +81,12 @@ function parar() {
     clearInterval(timer)
     timer = undefined;
   }
+
+  if(checaMeta(xRobo, yRobo)){
+    alert(`Cheguei ao final!\n o custo foi: ${custoAtual}\n girei: ${qntGiro}\n andei: ${qntMovimento} `)
+  } else if(xRobo !== 0 && yRobo !== 0) {
+    alert(`Não consegui chegar ao final\n o custo atual: ${custoAtual}\n girei: ${qntGiro}\n andei: ${qntMovimento} `)
+  }
 }
 
 function checaObstaculo(x, y) {
@@ -371,7 +377,7 @@ let modo = buscaEstrela;
 function loop(manual = false) {
   modo(manual);
 
-  if(checaMeta(xRobo, yRobo)) {
+  if(checaMeta(xRobo, yRobo) || custoAtual > 1000) {
     parar()
   }
 }
@@ -379,6 +385,8 @@ function loop(manual = false) {
 // 1 => direita
 // -1 => esquerda
 function girarRobo(movimento) {
+  // soma no custo
+  custoAtual += 1;
   qntGiro += 1;
 
   // isso garante que o robo se mova de  7 -> 0 ou de 0 -> 7
@@ -409,6 +417,7 @@ function moverRobo(manual = false) {
   // calcula se pode se mover para lá
   if(checaObstaculo(xNovo, yNovo)) return;
 
+  custoAtual += 1;
   qntMovimento += 1;
     
   // salva a div do robo
