@@ -1,0 +1,19 @@
+Trabalho desenvolvido pelos alunos:
+
+Adeilson dos Santos Mendes Júnior; 20190021008
+Vitor Machado Ribeiro; 20190024707
+
+Instruções de uso:
+
+Para executar o código é necessário abrir o html em um navegador,
+
+O botão "GERAR" recria a matrix e reinicia a posição do robo
+O botão "COMEÇAR" faz o robo começar a andar
+O botão "PARAR" faz o robo parar onde ele está
+
+Ao começar o robo irá parar se:
+1° chegar na meta
+2° o custo atual estiver maior que 1000 passos
+
+
+Os números em cada elemento da matrix indica quantas vezes ele passou por lá
