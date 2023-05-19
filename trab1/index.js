@@ -6,7 +6,7 @@
 let matrixBlocos = [];
 let matrixDivs = [];
 
-const delayMovimento = 50; // 1 segundo
+const delayMovimento = 100; // 1 segundo
 
 const tamanhoGrid = 10;
 
@@ -503,7 +503,7 @@ function configurar() {
 
       // 0.2% de chance de haver um obstaculo
       // isso pode gerar caminhos impossíveis por aleatoriedade
-      if (Math.random() < 0.2 ) {
+      if (Math.random() < 0.3 ) {
         matrixBlocos[i][j] = 2;
         matrixDivs[i][j].classList.add('bloco-obstaculo');
       }
