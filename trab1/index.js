@@ -84,7 +84,7 @@ function parar(isAlert = true) {
 
   if(checaMeta(xRobo, yRobo)){
     alert(`Cheguei ao final!\n o custo foi: ${custoAtual}\n girei: ${qntGiro}\n andei: ${qntMovimento} `)
-  } else if(xRobo !== 0 && yRobo !== 0 && isAlert) {
+  } else if(isAlert) {
     alert(`Não consegui chegar ao final\n o custo atual: ${custoAtual}\n girei: ${qntGiro}\n andei: ${qntMovimento} `)
   }
 }
