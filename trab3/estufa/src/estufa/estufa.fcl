@@ -1,0 +1,63 @@
+FUNCTION_BLOCK SistemaFuzzyAgua
+
+VAR_INPUT
+    temperatura : REAL;
+    umidade : REAL;
+END_VAR
+
+VAR_OUTPUT
+    quantidade_agua : REAL;
+END_VAR
+
+FUZZIFY temperatura
+    TERM baixa := (0, 1) (10, 1) (20, 0);
+    TERM media := (10, 0) (20, 1) (30, 0);
+    TERM alta := (20, 0) (30, 1) (40, 0);
+    TERM muito_alta := (30, 0) (40, 1) (50, 1);
+END_FUZZIFY
+
+FUZZIFY umidade
+    TERM baixa := (0, 1) (30, 1) (40, 0);
+    TERM media := (30, 0) (40, 1) (60, 0);
+    TERM alta := (40, 0) (60, 1) (80, 0);
+    TERM muito_alta := (60, 0) (80, 1) (100, 1);
+END_FUZZIFY
+
+DEFUZZIFY quantidade_agua
+    METHOD : COG; // Centro de gravidade
+
+    TERM muito_baixo := (0, 1) (20, 1) (25, 0);
+    TERM baixo := (10, 0) (20, 1) (40, 0);
+    TERM moderado := (20, 0) (40, 1) (60, 0);
+    TERM muito := (40, 0) (60, 1) (80, 0);
+    TERM muito_alta := (60, 0) (80, 1) (100, 1);
+
+    DEFAULT := 0; // Se nenhuma regra
+END_DEFUZZIFY
+
+RULEBLOCK regras
+    AND : MIN; // Agregar regras com MIN
+    ACT : MIN; // Ativar regras com MIN
+
+    RULE 1 : IF temperatura IS baixa AND umidade IS baixa THEN quantidade_agua IS baixo;
+    RULE 2 : IF temperatura IS baixa AND umidade IS media THEN quantidade_agua IS baixo;
+    RULE 3 : IF temperatura IS baixa AND umidade IS alta THEN quantidade_agua IS muito_baixo;
+    RULE 4 : IF temperatura IS baixa AND umidade IS muito_alta THEN quantidade_agua IS muito_baixo;
+
+    RULE 5 : IF temperatura IS media AND umidade IS baixa THEN quantidade_agua IS moderado;
+    RULE 6 : IF temperatura IS media AND umidade IS media THEN quantidade_agua IS moderado;
+    RULE 7 : IF temperatura IS media AND umidade IS alta THEN quantidade_agua IS baixo;
+    RULE 8 : IF temperatura IS media AND umidade IS muito_alta THEN quantidade_agua IS baixo;
+
+    RULE 9 : IF temperatura IS alta AND umidade IS baixa THEN quantidade_agua IS muito;
+    RULE 10 : IF temperatura IS alta AND umidade IS media THEN quantidade_agua IS moderado;
+    RULE 11 : IF temperatura IS alta AND umidade IS alta THEN quantidade_agua IS moderado;
+    RULE 12 : IF temperatura IS alta AND umidade IS muito_alta THEN quantidade_agua IS baixo;
+
+    RULE 13 : IF temperatura IS muito_alta AND umidade IS baixa THEN quantidade_agua IS muito_alta;
+    RULE 14 : IF temperatura IS muito_alta AND umidade IS media THEN quantidade_agua IS muito_alta;
+    RULE 15 : IF temperatura IS muito_alta AND umidade IS alta THEN quantidade_agua IS muito;
+    RULE 16 : IF temperatura IS muito_alta AND umidade IS muito_alta THEN quantidade_agua IS muito;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
