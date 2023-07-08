@@ -26,7 +26,7 @@ const itens = [
 
 // Parâmetros do algoritmo genético
 const tamanhoPopulacao = 50;
-const taxaMutacao = 0.15;
+const taxaMutacao = 0.03;
 const numeroGeracoes = 50;
 
 // Função de fitness de um indivíduo
@@ -134,8 +134,8 @@ function executarAlgoritmoGenetico() {
     
     for (let i = 0; i < tamanhoPopulacao; i++) {
       const individuosSelecionados = selecionarIndividuos(populacao);
-      const individuo1 = individuosSelecionados[0];
-      const individuo2 = individuosSelecionados[1];
+      const individuo1 = individuosSelecionados.pop();
+      const individuo2 = individuosSelecionados.pop();
       
       const [filho1, filho2] = crossover(individuo1, individuo2);
       
